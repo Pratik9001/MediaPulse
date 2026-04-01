@@ -13,7 +13,7 @@ import plotly.express as px
 # --- PAGE CONFIGURATION ---
 st.set_page_config(page_title="CineML Recommender", page_icon="🎬", layout="wide")
 
-TMDB_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1YmY0Yzk3YWYwNDBhZWIxMmQ3OWUzMjc1Nzc3N2Y4NyIsIm5iZiI6MTc3NTAyNzA5OC4zMDQsInN1YiI6IjY5Y2NjMzlhNTdkYTc3ZDhmYjI3ZjEwMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.dxgzeF72RqMvoNNqRAtwe4J6plhch18zq6oqR2XtHXo"  # <-- paste your key here
+TMDB_ACCESS_TOKEN = st.secrets.get("TMDB_ACCESS_TOKEN")  # <-- paste your key here
 TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500"
 FALLBACK_POSTER = "https://placehold.co/500x750/1f1f1f/ffffff/png?text=Poster%0ANot%0AAvailable"
 
