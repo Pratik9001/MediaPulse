@@ -23,7 +23,8 @@ DATASET_URL = "https://huggingface.co/datasets/PratikDhonde/movie-dataset/resolv
 def load_data():
     try:
         df = pd.read_csv( "https://huggingface.co/datasets/PratikDhonde/movie-dataset/resolve/main/cleaned_data.csv")
-    
+        if df.empty: return pd.DataFrame()
+        df.columns = df.columns.str.strip()    
     # Safely parse stringified lists/dictionaries
         def safe_parse(val):
             try:
@@ -37,32 +38,37 @@ def load_data():
         df['genres'] = df['genres'].apply(safe_parse)
         df['directors'] = df['directors'].apply(safe_parse)
         df['cast'] = df['cast'].apply(safe_parse)
-        df['reviews_list'] = df['reviews'].apply(safe_parse)
+      
     
     # Clean rating column to extract float
         df['rating_val'] = df['rating'].str.extract(r'([\d\.]+)').astype(float)
     
     # Create a combined features column for Content-Based Filtering
         df['combined_features'] = df['synopsis'].fillna('') + " " + \
-                                  df['genres'].apply(lambda x: ' '.join(x)) + " " + \
-                                  df['directors'].apply(lambda x: ' '.join(x))
+                                  df['genres'].astype(str) + " " + \
+                                  df['directors'].astype(str)
         return df
     except Exception as e:
-        st.error(f"Error loading dataset from Hugging Face: {e}")
+        
         return pd.DataFrame()
 df=load_data()
 @st.cache_data
-def get_user_reviews(df):
+def get_user_reviews(_df):
     all_reviews = []
-    for idx, row in df.iterrows():
-        for rev in row['reviews_list']:
-            if isinstance(rev, dict) and 'username' in rev:
-                all_reviews.append({
-                    'movie': row['title'],
-                    'username': rev['username'],
-                    'likes': rev.get('likes', 0),
-                    'review_text': rev.get('review_text', '')
-                })
+    for idx, row in _df.iterrows():
+        try:
+            reviews_list = ast.literal_eval(row['reviews'])
+            if isinstance(reviews_list, list):
+                for rev in reviews_list:
+                    if isinstance(rev, dict) and 'username' in rev:
+                        all_reviews.append({
+                            'movie': row['title'],
+                            'username': rev['username'],
+                            'likes': rev.get('likes', 0),
+                            'review_text': rev.get('review_text', '')
+                        })
+        except:
+            continue
     return pd.DataFrame(all_reviews)
 
 # Load data
