@@ -154,7 +154,7 @@ def show_movie_details(movie_row):
     
     with col1:
         # Pass the URL through our new backend fetcher
-        st.image(get_tmdb_poster(row['title'], row['year'])))
+        st.image(get_tmdb_poster(row['title'], row['year']))
         
     with col2:
         st.header(f"{movie_row['title']} ({movie_row['year']})")
