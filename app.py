@@ -27,9 +27,12 @@ def load_data():
     # Safely parse stringified lists/dictionaries
         def safe_parse(val):
             try:
-                return ast.literal_eval(val)
+                parsed = ast.literal_eval(val)
+                if isinstance(parsed, list):
+                    return tuple(parsed) # Convert list to tuple here!
+                return parsed
             except:
-                return []
+                return ()
             
         df['genres'] = df['genres'].apply(safe_parse)
         df['directors'] = df['directors'].apply(safe_parse)
@@ -68,9 +71,9 @@ reviews_df = get_user_reviews(df)
 
 # --- ML MODELS ---
 @st.cache_data
-def compute_cosine_sim(df):
+def compute_cosine_sim(_df):
     tfidf = TfidfVectorizer(stop_words='english')
-    tfidf_matrix = tfidf.fit_transform(df['combined_features'])
+    tfidf_matrix = tfidf.fit_transform(_df['combined_features'])
     return cosine_similarity(tfidf_matrix, tfidf_matrix)
 
 cosine_sim = compute_cosine_sim(df)
