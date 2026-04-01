@@ -18,31 +18,36 @@ TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500"
 FALLBACK_POSTER = "https://placehold.co/500x750/1f1f1f/ffffff/png?text=Poster%0ANot%0AAvailable"
 
 # --- DATA LOADING & PREPROCESSING ---
+DATASET_URL = "https://huggingface.co/datasets/PratikDhonde/movie-dataset/resolve/main/cleaned_data.csv"
 @st.cache_data
 def load_data():
-    df = pd.read_csv('cleaned_data.csv')
+    try:
+        df = pd.read_csv('DATASET_URL')
     
     # Safely parse stringified lists/dictionaries
-    def safe_parse(val):
-        try:
-            return ast.literal_eval(val)
-        except:
-            return []
+        def safe_parse(val):
+            try:
+                return ast.literal_eval(val)
+            except:
+                return []
             
-    df['genres'] = df['genres'].apply(safe_parse)
-    df['directors'] = df['directors'].apply(safe_parse)
-    df['cast'] = df['cast'].apply(safe_parse)
-    df['reviews_list'] = df['reviews'].apply(safe_parse)
+        df['genres'] = df['genres'].apply(safe_parse)
+        df['directors'] = df['directors'].apply(safe_parse)
+        df['cast'] = df['cast'].apply(safe_parse)
+        df['reviews_list'] = df['reviews'].apply(safe_parse)
     
     # Clean rating column to extract float
-    df['rating_val'] = df['rating'].str.extract(r'([\d\.]+)').astype(float)
+        df['rating_val'] = df['rating'].str.extract(r'([\d\.]+)').astype(float)
     
     # Create a combined features column for Content-Based Filtering
-    df['combined_features'] = df['synopsis'].fillna('') + " " + \
-                              df['genres'].apply(lambda x: ' '.join(x)) + " " + \
-                              df['directors'].apply(lambda x: ' '.join(x))
-    return df
-
+        df['combined_features'] = df['synopsis'].fillna('') + " " + \
+                                  df['genres'].apply(lambda x: ' '.join(x)) + " " + \
+                                  df['directors'].apply(lambda x: ' '.join(x))
+        return df
+    except Exception as e:
+        st.error(f"Error loading dataset from Hugging Face: {e}")
+        return pd.DataFrame()
+df=load_data()
 @st.cache_data
 def get_user_reviews(df):
     all_reviews = []
