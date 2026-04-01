@@ -4,3 +4,6 @@ numpy
 scikit-learn
 textblob
 plotly
+requests
+datasets
+fsspec
