@@ -22,7 +22,7 @@ DATASET_URL = "https://huggingface.co/datasets/PratikDhonde/movie-dataset/resolv
 @st.cache_data
 def load_data():
     try:
-        df = pd.read_csv('DATASET_URL')
+        df = pd.read_csv( "https://huggingface.co/datasets/PratikDhonde/movie-dataset/resolve/main/cleaned_data.csv")
     
     # Safely parse stringified lists/dictionaries
         def safe_parse(val):
